@@ -1,109 +1,130 @@
 let humanScore = 0;
 let computerScore = 0;
-let currentround = 0;
-function getComputerChoice(){
-    let x = Math.floor(Math.random()*3+1);
-    switch(x){
-        case 1:
-            return "rock";
-
-        case 2:
-            return "paper";
-
-        case 3:
-            return "scissor";
+let rounds = 0;
+let humanChoice;
+let computerChoice;
+let getComputerChoice = function(){
+    let x = Math.floor(Math.random()*3);
+    if(x == 0){
+        return "rock";
+    }
+    else if(x == 1){
+        return "paper";
+    }
+    else{
+        return "scissor";
     }
 }
+let numberOfRounds;
+const inputRounds = document.querySelector("#inpt");
+const btn = document.querySelector("#submit");
+const hs = document.querySelector("#humanS");
+const cs = document.querySelector("#computerS");
+btn.addEventListener("click",function(){
+    numberOfRounds = parseInt(inputRounds.value);
+    if(isNaN(numberOfRounds) || numberOfRounds<=0){
+        alert("Enter a valid number in the number of rounds section!!")
+    }
+})
 
-let numberofrounds;
-document.getElementById("s1").onclick = function(){
-    numberofrounds = document.getElementById("rounds").value;
-    numberofrounds = Number(numberofrounds);
-    console.log(`The game of ${numberofrounds} starts now!!! choose your pick`);
-}
+const text = document.querySelector("#present");
+const final = document.querySelector("#final");
 
-let userchoice;
-document.getElementById("s2").onclick = function(){
-    if(currentround >= numberofrounds){
-        console.log("Please restart the game");
+function playRound(humanChoice,computerChoice){
+    if(numberOfRounds === undefined){
+        alert("Enter number of rounds first!!");
         return;
     }
-    userchoice = document.getElementById("choice").value;
-    let computerchoice = getComputerChoice();
+    if(humanChoice == computerChoice){
+        text.textContent = `Its a draw!!, you both choose ${humanChoice}`;
+    }
+    else if(computerChoice == "rock"){
+        if(humanChoice == "paper"){
+            humanScore++;
+            text.textContent = `You won!!, ${humanChoice} beats ${computerChoice}`;
 
-    playround(computerchoice,userchoice);
-    currentround++;
 
-    if(currentround < numberofrounds){
-        console.log("round over, choose your next pick");
+        }
+        else{
+            computerScore++;
+            text.textContent = `You lost!!, ${computerChoice} beats ${humanChoice}`;
+        }
+    }
+    else if(computerChoice == "paper"){
+        if(humanChoice == "scissor"){
+            humanScore++;
+            text.textContent = `You won!!, ${humanChoice} beats ${computerChoice}`;
+        }
+        else{
+            computerScore++;
+            text.textContent = `You lost!!, ${computerChoice} beats ${humanChoice}`;
+        }
     }
     else{
-        console.log("Rounds are over");
+        if(humanChoice === "rock"){
+            humanScore++;
+            text.textContent = `You won!!, ${humanChoice} beats ${computerChoice}`;
+        }
+        else{
+            computerScore++;
+            text.textContent = `You lost!!, ${computerChoice} beats ${humanChoice}`;
+        }
+    }
+    
+    hs.textContent = humanScore;
+    cs.textContent = computerScore;
+    rounds++;
+}
+
+const choice = document.querySelector("#choices");
+choice.addEventListener("click",function(elem){
+    if(numberOfRounds <= rounds){
+        text.textContent = "You have completed all the rounds, click restart to play again!"
+        return;
+    }
+    computerChoice = getComputerChoice();
+    let choose = elem.target.closest("button").id;
+    switch(choose){
+        case "r":
+            humanChoice = "rock";
+            playRound(humanChoice,computerChoice);
+            break;
+
+        case "p":
+            humanChoice = "paper";
+            playRound(humanChoice,computerChoice);
+            break;
+
+        case "s":
+            humanChoice = "scissor";
+            playRound(humanChoice,computerChoice);
+            break;
+    }
+
+    if(rounds == numberOfRounds){
         if(humanScore > computerScore){
-            console.log("You won, yipeeeee!!")
+            final.textContent = `You WON!!, you beat computer by (${humanScore}-${computerScore}) rounds`;
         }
-        else if(humanScore < computerScore){
-            console.log("You loose ;(")
-        }
-        else{
-            console.log("Its a tie!!")
-        }
-    }
-}
-
-function getUserChoice(){
-    return userchoice;
-}
-
-function playround(computerChoice, userChoice){
-    if(computerChoice.toLowerCase() == "rock"){
-        if(userChoice.toLowerCase() == "rock"){
-            console.log(`Tie!! as you and computer choose exactly ${computerChoice.toLowerCase()}`)
-        }
-        else if(userChoice.toLowerCase() == "paper"){
-            humanScore++;
-            console.log(`you won ${userChoice.toLowerCase()} beats ${computerChoice.toLowerCase()}`)
+        else if(humanScore == computerScore){
+            final.textContent = `Its a TIE!!, you both won ${humanScore} amounts of rounds`;
         }
         else{
-            computerScore++;
-            console.log(`you lose!  ${computerChoice.toLowerCase()} beats ${userChoice.toLowerCase()}`)
+            final.textContent = `You LOST!!, your computer beat you by (${computerScore}-${humanScore}) rounds`;
         }
+
+        inputRounds.value = "";
     }
-
-    else if(computerChoice.toLowerCase() == "paper"){
-        if(userChoice.toLowerCase() == "rock"){
-            computerScore++;
-            console.log(`you lose!  ${computerChoice.toLowerCase()} beats ${userChoice.toLowerCase()}`)
-        }
-        else if(userChoice.toLowerCase() == "paper"){
-            console.log(`Tie!! as you and computer choose exactly ${computerChoice.toLowerCase()}`)
-        }
-        else{
-            humanScore++;
-            console.log(`you won ${userChoice.toLowerCase()} beats ${computerChoice.toLowerCase()}`)
-        }
-    }
-
-    else{
-        if(userChoice.toLowerCase() == "rock"){
-            humanScore++;
-            console.log(`you won ${userChoice.toLowerCase()} beats ${computerChoice.toLowerCase()}`)
-        }
-        else if(userChoice.toLowerCase() == "paper"){
-            computerScore++;
-            console.log(`you lose!  ${computerChoice.toLowerCase()} beats ${userChoice.toLowerCase()}`)
-        }
-        else{
-            console.log(`Tie!! as you and computer choose exactly ${computerChoice.toLowerCase()}`)
-        }
-    }
-}
+})
 
 
-document.getElementById("restart").onclick = function(){
-    currentround = 0;
+const restart = document.querySelector("#restart");
+restart.addEventListener("click",function(){
     humanScore = 0;
     computerScore = 0;
-    numberofrounds = 0;
-    console.log("Your game has been restarted, enter number of rounds to start the game");
-}
+    hs.textContent = humanScore;
+    cs.textContent = computerScore;
+    rounds = 0;
+    final.textContent = "";
+    text.textContent = "";
+    alert("You have restarted the game, enter the number of rounds again!")
+})
